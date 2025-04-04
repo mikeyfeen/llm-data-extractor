@@ -7,7 +7,7 @@ import { useCredits } from "@/context/credits";
 
 //TODO: Add form validation
 const QueryForm = () => {
-  const { credits, setCredits, loading} = useCredits();
+  const { credits, setCredits, loading } = useCredits();
   const [formdata, setformData] = React.useState<string | null>(null);
   const [loadingSubmit, setLoadingSubmit] = React.useState(false);
   const [error, setError] = React.useState<string | null>(null);
@@ -64,10 +64,16 @@ const QueryForm = () => {
 
         // Ensure the parsed data is an array
         if (!Array.isArray(parsedData)) {
+          setError(
+            "Failed to parse data. Please try again. Make sure your input is detailed enough."
+          );
           setLoadingSubmit(false);
           throw new Error("Parsed data is not an array");
         }
       } catch (error) {
+        setError(
+          "Failed to parse data. Please try again. Make sure your input is detailed enough."
+        );
         console.error("Failed to parse API response as JSON:", error);
         setLoadingSubmit(false);
         return;
