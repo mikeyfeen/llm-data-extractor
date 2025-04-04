@@ -4,16 +4,19 @@ import React, { createContext, useState, useContext, useEffect } from "react";
 // Create the context
 export const CreditsContext = createContext<{
   credits: number | null;
-  setCredits: React.Dispatch<React.SetStateAction<number | null>>;
+  setCredits: React.Dispatch<React.SetStateAction<number>>;
+  loading: boolean;
 }>({
   credits: 0,
   setCredits: () => {},
+  loading: true,
 });
 // Create a provider component
 export const CreditsProvider: React.FC<{ children: React.ReactNode }> = ({
   children,
 }) => {
-  const [credits, setCredits] = useState<number | null>(null);
+  const [credits, setCredits] = useState<number>(20);
+  const [loading, setLoading] = useState(true);
 
   // Initialize credits from localStorage
   useEffect(() => {
@@ -23,6 +26,7 @@ export const CreditsProvider: React.FC<{ children: React.ReactNode }> = ({
     } else {
       localStorage.setItem("credits", "20"); // Initialize if not present
     }
+    setLoading(false); // Set loading to false after checking localStorage
   }, []);
 
   // Update localStorage whenever credits change
@@ -33,7 +37,7 @@ export const CreditsProvider: React.FC<{ children: React.ReactNode }> = ({
   }, [credits]);
 
   return (
-    <CreditsContext.Provider value={{ credits, setCredits }}>
+    <CreditsContext.Provider value={{ credits, setCredits, loading }}>
       {children}
     </CreditsContext.Provider>
   );

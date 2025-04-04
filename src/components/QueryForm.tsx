@@ -7,13 +7,13 @@ import { useCredits } from "@/context/credits";
 
 //TODO: Add form validation
 const QueryForm = () => {
-  const { credits, setCredits } = useCredits();
+  const { credits, setCredits, loading} = useCredits();
   const [formdata, setformData] = React.useState<string | null>(null);
-  const [loading, setLoading] = React.useState(false);
+  const [loadingSubmit, setLoadingSubmit] = React.useState(false);
   const [error, setError] = React.useState<string | null>(null);
   const { setTableData } = useTableData(); // Access the context's setter function
 
-  if (credits == null) {
+  if (loading) {
     return <div>Loading...</div>; // Handle loading state for credits
   }
 
@@ -26,7 +26,7 @@ const QueryForm = () => {
     }
 
     // Check if credits are available
-    if (credits > 0) {
+    if (credits !== null && credits > 0) {
       setCredits(credits - 1);
       localStorage.setItem("credits", (credits - 1).toString());
     } else {
@@ -34,7 +34,7 @@ const QueryForm = () => {
       return;
     }
 
-    setLoading(true); // Set loading state to true
+    setLoadingSubmit(true); // Set loading state to true
     try {
       const response = await fetch("/api/extract", {
         method: "POST",
@@ -43,7 +43,7 @@ const QueryForm = () => {
       });
 
       if (!response.ok) {
-        setLoading(false); // Set loading state to false
+        setLoadingSubmit(false); // Set loading state to false
         setError("Failed to send query. Please try again.");
         console.error("Failed to send query");
         return;
@@ -64,25 +64,25 @@ const QueryForm = () => {
 
         // Ensure the parsed data is an array
         if (!Array.isArray(parsedData)) {
-          setLoading(false);
+          setLoadingSubmit(false);
           throw new Error("Parsed data is not an array");
         }
       } catch (error) {
         console.error("Failed to parse API response as JSON:", error);
-        setLoading(false);
+        setLoadingSubmit(false);
         return;
       }
       // Update the table data context
       setTableData(parsedData);
-      setLoading(false); // Set loading state to false
+      setLoadingSubmit(false); // Set loading state to false
       setError(null); // Clear any previous error
     } catch (error) {
-      setLoading(false); // Set loading state to false
+      setLoadingSubmit(false); // Set loading state to false
       console.error("Error fetching data:", error);
     }
   };
 
-  return credits > 0 ? (
+  return credits !== null && credits > 0 ? (
     <>
       {error && <p className="text-red-500 text-xs">{error}</p>}
       <Textarea
@@ -94,8 +94,8 @@ const QueryForm = () => {
         <span className="font-bold">Note:</span> The more detailed your query,
         the better the results. <br /> You have {credits} credits left.
       </div>
-      <Button disabled={loading} className="mt-2" onClick={handleSubmit}>
-        {loading ? "Loading..." : "Send"}
+      <Button disabled={loadingSubmit} className="mt-2" onClick={handleSubmit}>
+        {loadingSubmit ? "Loading..." : "Send"}
       </Button>
       <div className=" border-b-2 p-0 m-0">
         &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
