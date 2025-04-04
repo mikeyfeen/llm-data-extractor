@@ -3,8 +3,8 @@ import React, { createContext, useState, useContext, useEffect } from "react";
 
 // Create the context
 export const CreditsContext = createContext<{
-  credits: number;
-  setCredits: React.Dispatch<React.SetStateAction<number>>;
+  credits: number | null;
+  setCredits: React.Dispatch<React.SetStateAction<number | null>>;
 }>({
   credits: 0,
   setCredits: () => {},
@@ -13,7 +13,7 @@ export const CreditsContext = createContext<{
 export const CreditsProvider: React.FC<{ children: React.ReactNode }> = ({
   children,
 }) => {
-  const [credits, setCredits] = useState<number>(20);
+  const [credits, setCredits] = useState<number | null>(null);
 
   // Initialize credits from localStorage
   useEffect(() => {
@@ -27,7 +27,9 @@ export const CreditsProvider: React.FC<{ children: React.ReactNode }> = ({
 
   // Update localStorage whenever credits change
   useEffect(() => {
-    localStorage.setItem("credits", credits.toString());
+    if (credits) {
+      localStorage.setItem("credits", credits.toString());
+    }
   }, [credits]);
 
   return (
@@ -36,6 +38,7 @@ export const CreditsProvider: React.FC<{ children: React.ReactNode }> = ({
     </CreditsContext.Provider>
   );
 };
+
 // Custom hook for consuming the context
 export const useCredits = () => {
   const context = useContext(CreditsContext);

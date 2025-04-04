@@ -10,15 +10,22 @@ const QueryForm = () => {
   const { credits, setCredits } = useCredits();
   const [formdata, setformData] = React.useState<string | null>(null);
   const [loading, setLoading] = React.useState(false);
+  const [error, setError] = React.useState<string | null>(null);
   const { setTableData } = useTableData(); // Access the context's setter function
+
+  if (!credits) {
+    return <div>Loading...</div>; // Handle loading state for credits
+  }
 
   const handleSubmit = async () => {
     // Check if formdata is not null or empty
     if (!formdata) {
+      setError("Please enter a valid query.");
       console.error("Form data is missing");
       return;
     }
 
+    // Check if credits are available
     if (credits > 0) {
       setCredits(credits - 1);
     } else {
@@ -35,11 +42,11 @@ const QueryForm = () => {
       });
 
       if (!response.ok) {
+        setLoading(false); // Set loading state to false
+        setError("Failed to send query. Please try again.");
         console.error("Failed to send query");
         return;
       }
-
-      // Check if user has enough credits
 
       // Read the response as text
       const rawData = await response.text();
@@ -67,6 +74,7 @@ const QueryForm = () => {
       // Update the table data context
       setTableData(parsedData);
       setLoading(false); // Set loading state to false
+      setError(null); // Clear any previous error
     } catch (error) {
       setLoading(false); // Set loading state to false
       console.error("Error fetching data:", error);
@@ -75,7 +83,9 @@ const QueryForm = () => {
 
   return credits > 0 ? (
     <>
+      {error && <p className="text-red-500 text-xs">{error}</p>}
       <Textarea
+        className="w-full h-32"
         placeholder="Describe your project features here..."
         onChange={(e) => setformData(e.target.value)}
       />
@@ -96,7 +106,7 @@ const QueryForm = () => {
         placeholder="Describe your project features here..."
         onChange={(e) => setformData(e.target.value)}
       />
-      <div className="text-sm text-gray-500 text-center">
+      <div className="text-sm text-red-400 text-center">
         <span className="font-bold">Note:</span> You've reached the limit.
         Please purchase more credits to continue.
       </div>
