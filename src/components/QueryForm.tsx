@@ -13,7 +13,7 @@ const QueryForm = () => {
   const [error, setError] = React.useState<string | null>(null);
   const { setTableData } = useTableData(); // Access the context's setter function
 
-  if (!credits) {
+  if (credits == null) {
     return <div>Loading...</div>; // Handle loading state for credits
   }
 
@@ -28,6 +28,7 @@ const QueryForm = () => {
     // Check if credits are available
     if (credits > 0) {
       setCredits(credits - 1);
+      localStorage.setItem("credits", (credits - 1).toString());
     } else {
       console.error("Not enough credits");
       return;
@@ -107,8 +108,7 @@ const QueryForm = () => {
         onChange={(e) => setformData(e.target.value)}
       />
       <div className="text-sm text-red-400 text-center">
-        <span className="font-bold">Note:</span> You've reached the limit.
-        Please purchase more credits to continue.
+        You've reached the limit. Please purchase more credits to continue.
       </div>
       <Button disabled>Send</Button>
     </>

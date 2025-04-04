@@ -38,7 +38,6 @@ export const CreditsProvider: React.FC<{ children: React.ReactNode }> = ({
     </CreditsContext.Provider>
   );
 };
-
 // Custom hook for consuming the context
 export const useCredits = () => {
   const context = useContext(CreditsContext);
